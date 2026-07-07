@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.weight
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.FilterChip
@@ -106,6 +105,31 @@ fun AddEditTodoDialog(
                 val day = dayText.toIntOrNull()
 
                 if (title.isBlank()) {
+                    errorMessage = "請輸入事項名稱"
+                    return@TextButton
+                }
+                if (year == null || month == null || day == null) {
+                    errorMessage = "請輸入完整日期"
+                    return@TextButton
+                }
+                try {
+                    LocalDate.of(year, month, day)
+                } catch (e: Exception) {
+                    errorMessage = "日期不合法，請確認月份(1-12)與日期是否正確"
+                    return@TextButton
+                }
+                onConfirm(title.trim(), selectedCategory, year, month, day)
+            }) {
+                Text("儲存")
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text("取消")
+            }
+        }
+    )
+}                if (title.isBlank()) {
                     errorMessage = "請輸入事項名稱"
                     return@TextButton
                 }
