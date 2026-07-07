@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Star
-import androidx.compose.material.icons.outlined.Star
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -64,11 +63,11 @@ fun TodoItemRow(
         )
 
         IconButton(onClick = onToggleHighlight) {
-            if (item.isHighlighted) {
-                Icon(Icons.Filled.Star, contentDescription = "取消標記", tint = Color(0xFF1565FF))
-            } else {
-                Icon(Icons.Outlined.Star, contentDescription = "標記", tint = Color.Gray)
-            }
+            Icon(
+                Icons.Filled.Star,
+                contentDescription = if (item.isHighlighted) "取消標記" else "標記",
+                tint = if (item.isHighlighted) Color(0xFF1565FF) else Color.LightGray
+            )
         }
 
         Column(modifier = Modifier.weight(1f)) {
