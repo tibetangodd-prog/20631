@@ -129,29 +129,4 @@ fun AddEditTodoDialog(
             }
         }
     )
-}                if (title.isBlank()) {
-                    errorMessage = "請輸入事項名稱"
-                    return@TextButton
-                }
-                if (year == null || month == null || day == null) {
-                    errorMessage = "請輸入完整日期"
-                    return@TextButton
-                }
-                try {
-                    LocalDate.of(year, month, day)
-                } catch (e: Exception) {
-                    errorMessage = "日期不合法，請確認月份(1-12)與日期是否正確"
-                    return@TextButton
-                }
-                onConfirm(title.trim(), selectedCategory, year, month, day)
-            }) {
-                Text("儲存")
-            }
-        },
-        dismissButton = {
-            TextButton(onClick = onDismiss) {
-                Text("取消")
-            }
-        }
-    )
 }
