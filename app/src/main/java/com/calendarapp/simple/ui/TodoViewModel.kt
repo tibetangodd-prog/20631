@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.calendarapp.simple.data.Category
+import com.calendarapp.simple.data.RecurrenceType
 import com.calendarapp.simple.data.TodoItem
 import com.calendarapp.simple.data.TodoRepository
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -46,10 +47,17 @@ class TodoViewModel(private val repository: TodoRepository) : ViewModel() {
         _selectedCategories.value = emptySet()
     }
 
-    fun addTodo(title: String, category: Category, year: Int, month: Int, day: Int) {
+    fun addTodo(title: String, category: Category, year: Int, month: Int, day: Int, recurrence: RecurrenceType = RecurrenceType.NONE) {
         viewModelScope.launch {
             repository.insert(
-                TodoItem(title = title, category = category, year = year, month = month, day = day)
+                TodoItem(
+                    title = title,
+                    category = category,
+                    year = year,
+                    month = month,
+                    day = day,
+                    recurrence = recurrence
+                )
             )
         }
     }
@@ -62,7 +70,25 @@ class TodoViewModel(private val repository: TodoRepository) : ViewModel() {
 
     fun toggleCompleted(item: TodoItem) {
         viewModelScope.launch {
-            repository.update(item.copy(isCompleted = !item.isCompleted))
+            val nowCompleted = !item.isCompleted
+            repository.update(item.copy(isCompleted = nowCompleted))
+
+            // 只有在「從未完成變成完成」時才自動排下一次，避免使用者取消勾選時又重複產生
+            if (nowCompleted) {
+                val nextDate = item.nextOccurrenceDate()
+                if (nextDate != null) {
+                    repository.insert(
+                        TodoItem(
+                            title = item.title,
+                            category = item.category,
+                            year = nextDate.year,
+                            month = nextDate.monthValue,
+                            day = nextDate.dayOfMonth,
+                            recurrence = item.recurrence
+                        )
+                    )
+                }
+            }
         }
     }
 
