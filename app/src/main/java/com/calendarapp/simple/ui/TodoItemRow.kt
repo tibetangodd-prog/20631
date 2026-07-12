@@ -83,6 +83,14 @@ fun TodoItemRow(
                     fontSize = 12.sp,
                     color = Color.DarkGray
                 )
+                if (item.recurrence != com.calendarapp.simple.data.RecurrenceType.NONE) {
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = "🔁 ${item.recurrence.displayName}",
+                        fontSize = 12.sp,
+                        color = Color(0xFF1565FF)
+                    )
+                }
             }
         }
 
