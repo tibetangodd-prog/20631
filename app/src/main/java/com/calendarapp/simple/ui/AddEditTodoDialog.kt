@@ -24,15 +24,17 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.calendarapp.simple.data.Category
+import com.calendarapp.simple.data.RecurrenceType
 import java.time.LocalDate
 
 @Composable
 fun AddEditTodoDialog(
     onDismiss: () -> Unit,
-    onConfirm: (title: String, category: Category, year: Int, month: Int, day: Int) -> Unit
+    onConfirm: (title: String, category: Category, year: Int, month: Int, day: Int, recurrence: RecurrenceType) -> Unit
 ) {
     var title by remember { mutableStateOf("") }
     var selectedCategory by remember { mutableStateOf(Category.HOMEWORK) }
+    var selectedRecurrence by remember { mutableStateOf(RecurrenceType.NONE) }
     val today = remember { LocalDate.now() }
     var yearText by remember { mutableStateOf(today.year.toString()) }
     var monthText by remember { mutableStateOf(today.monthValue.toString()) }
@@ -96,6 +98,19 @@ fun AddEditTodoDialog(
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(it, color = Color.Red, fontSize = 12.sp)
                 }
+
+                Spacer(modifier = Modifier.height(12.dp))
+                Text("重複")
+                Row(modifier = Modifier.fillMaxWidth()) {
+                    RecurrenceType.entries.forEach { recurrence ->
+                        FilterChip(
+                            selected = selectedRecurrence == recurrence,
+                            onClick = { selectedRecurrence = recurrence },
+                            label = { Text(recurrence.displayName) },
+                            modifier = Modifier.padding(end = 4.dp)
+                        )
+                    }
+                }
             }
         },
         confirmButton = {
@@ -118,7 +133,7 @@ fun AddEditTodoDialog(
                     errorMessage = "日期不合法，請確認月份(1-12)與日期是否正確"
                     return@TextButton
                 }
-                onConfirm(title.trim(), selectedCategory, year, month, day)
+                onConfirm(title.trim(), selectedCategory, year, month, day, selectedRecurrence)
             }) {
                 Text("儲存")
             }
