@@ -5,8 +5,10 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
+import androidx.sqlite.db.SupportSQLiteDatabase
+import androidx.room.migration.Migration
 
-@Database(entities = [TodoItem::class], version = 1, exportSchema = false)
+@Database(entities = [TodoItem::class], version = 2, exportSchema = false)
 @TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun todoDao(): TodoDao
@@ -14,6 +16,14 @@ abstract class AppDatabase : RoomDatabase() {
     companion object {
         @Volatile
         private var INSTANCE: AppDatabase? = null
+
+        private val MIGRATION_1_2 = object : Migration(1, 2) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL(
+                    "ALTER TABLE todo_items ADD COLUMN recurrence TEXT NOT NULL DEFAULT 'NONE'"
+                )
+            }
+        }
 
         // 這個資料庫檔案會存放在 App 專屬的 databases/ 資料夾（內部儲存空間），
         // 手機系統設定裡的「清除快取(cache)」不會動到這裡，
@@ -24,7 +34,9 @@ abstract class AppDatabase : RoomDatabase() {
                     context.applicationContext,
                     AppDatabase::class.java,
                     "calendar_app.db"
-                ).build()
+                )
+                    .addMigrations(MIGRATION_1_2)
+                    .build()
                 INSTANCE = instance
                 instance
             }
