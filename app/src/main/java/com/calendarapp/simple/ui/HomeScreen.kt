@@ -116,8 +116,8 @@ fun HomeScreen(viewModel: TodoViewModel) {
     if (showAddDialog) {
         AddEditTodoDialog(
             onDismiss = { showAddDialog = false },
-            onConfirm = { title, category, year, month, day ->
-                viewModel.addTodo(title, category, year, month, day)
+            onConfirm = { title, category, year, month, day, recurrence ->
+                viewModel.addTodo(title, category, year, month, day, recurrence)
                 showAddDialog = false
             }
         )
